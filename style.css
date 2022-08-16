@@ -1,0 +1,94 @@
+html, * {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: rgb(190, 198, 118);
+}
+
+button {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 400;
+    font-size: large;
+    background-color: rgb(127, 127, 127);
+    flex: 1;
+    border-radius: 20%;
+    border: 1px solid black;
+    box-shadow:0px 5px 10px -3px black;
+}
+
+button:active {
+    transform: translate(0%,2%);
+}
+
+#calc_body {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin: 10vh auto;
+    width: 40vw;
+    max-width: 300px;
+    height: 70vh;
+    background-color: rgb(191, 191, 191);
+    border-radius: 10px;
+    border: 1px solid rgb(127, 127, 127);
+    gap: 2px;
+    box-shadow: -3px 3px 2px;
+}
+
+.calc_operation {
+    border: 7px solid rgb(55, 55, 55);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 2px;
+    gap: 2px;
+}
+
+#live {
+    flex-shrink: inherit;
+}
+
+.display {
+    gap: 2px;
+    flex: 1;
+    background-color: rgb(127, 127, 127);
+    font-family: "Orbitron",sans-serif;
+    font-size: 20px;
+    max-height: 20%;
+    display: flex;
+    flex-direction: column;
+    border: 7px solid rgb(55, 55, 55);
+    border-radius: 10px;
+    text-align: right;
+    justify-content: space-between;
+    
+}
+
+.row {
+    display: flex;
+    flex: 1;
+    gap: 2px;
+}
+
+.numbers {
+    background-color: rgb(55, 55, 55);
+    color: white;
+}
+
+.operator, #result, #square {
+    background-color: rgb(236, 236, 236);
+}
+
+#clearAll, #clearEntry {
+    background-color: chocolate;
+    color: white;
+}
+
+footer, a {
+    font-family: Helvetica, sans-serif;
+    text-align: center;
+    text-decoration: none;
+    color: black;
+}
