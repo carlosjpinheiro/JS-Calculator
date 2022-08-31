@@ -1,91 +1,118 @@
-const display = document.querySelector('.display');
+const buttons = document.querySelectorAll('button');
 const registeredDisplay = document.querySelector('#registered');
 const liveDisplay = document.querySelector('#live');
-const numbers = document.querySelectorAll('.numbers');
-const operators = document.querySelectorAll('.operator');
-const resultBtn = document.querySelector('#result');
-const squareRoot = document.querySelector('#square');
 const clearEntry = document.querySelector('#clearEntry');
 const clearAll = document.querySelector('#clearAll');
-let num1;
-let num2;
-let operator;   
+let num1 = 0;
+let num2 = 0;
+let numRes = 0;
+let numBuffer = '';
+let operator = '';   
+let lastClick;
 let resultFlag = false;
 
-function displayMng (operatorTxt) {
-    num1 = parseFloat(liveDisplay.textContent);
-    if (num1) {
-        registeredDisplay.textContent = liveDisplay.textContent + ' ' + operatorTxt.replace('bⁿ', '^');
-        liveDisplay.textContent = '';
-        operator = operatorTxt;
+function displayMng(button) {
+    switch (lastClick) {
+        case 'square':
+            if (liveDisplay.textContent != '0' && !resultFlag) {
+                num1 = parseFloat(((numBuffer) ** (1/2)).toFixed(2));
+                operator = '√';
+                registeredDisplay.textContent = `${operator} ${numBuffer} = ${(num1).toFixed(2)}`;
+                liveDisplay.textContent = '0';
+                numBuffer = '';
+            } else if (resultFlag) {
+                operator = '√';
+                numRes = num1 ** (1/2);
+                registeredDisplay.textContent = `${operator} ${num1} = ${numRes.toFixed(2)}`;
+                liveDisplay.textContent = '0';
+                num1 = parseFloat(numRes.toFixed(2));
+                resultFlag = false;
+            }
+            break
+        case 'result':
+            if (liveDisplay.textContent != '0') {
+                num2 = parseFloat(numBuffer);
+                (String(operate(operator,num1,num2)).length > 16) ? numRes = Infinity : numRes = operate(operator,num1,num2);
+                registeredDisplay.textContent = `${num1} ${operator.replace('bⁿ', '^')} ${num2} = ${numRes.toFixed(2)} `;
+                liveDisplay.textContent = '';
+                numBuffer = '';
+                num1 = parseFloat(numRes.toFixed(2));
+                resultFlag = true;
+            }
+            break
+        case 'operator':
+            if (liveDisplay.textContent == '0') {
+                operator = button.textContent;
+                if (num1) registeredDisplay.textContent = `${num1.toFixed(2)} ${operator.replace('bⁿ', '^')}`;
+            } else {
+                if (!operator) {
+                    operator = button.textContent;
+                    num1 = parseFloat(numBuffer);
+                    registeredDisplay.textContent = `${num1.toFixed(2)} ${operator.replace('bⁿ', '^')} `;
+                    liveDisplay.textContent = '0';
+                    numBuffer = '';
+                } else if (resultFlag) {
+                    operator = button.textContent;
+                    registeredDisplay.textContent = `${num1.toFixed(2)} ${operator.replace('bⁿ', '^')} `;
+                    liveDisplay.textContent = '0';
+                    resultFlag = false;
+                } else {
+                    num2 = parseFloat(numBuffer);
+                    (String(operate(operator,num1,num2)).length > 16) ? numRes = Infinity : numRes = operate(operator,num1,num2);
+                    operator = button.textContent;
+                    registeredDisplay.textContent = `${numRes.toFixed(2)} ${operator.replace('bⁿ', '^')} `;
+                    liveDisplay.textContent = '0';
+                    numBuffer = '';
+                    num1 = parseFloat(numRes.toFixed(2));
+                }
+            }
+            break
+        case 'numbers':
+            if ((button.textContent == '.' && liveDisplay.textContent.indexOf('.') == -1) || (button.textContent != '.')) {
+                numBuffer += button.textContent;
+                liveDisplay.textContent = numBuffer;
+            } 
+            break;
     }
-    console.log(!num1)
-    
 }
 
-function operate(operator, num1, n2) {
-    let result;
-    num2 = n2;
+function operate(operator, n1, n2) {
     switch (operator) {
         case '+':
-            result = num1 + num2; 
-            break;
+            return parseFloat((n1 + n2).toFixed(2));
         case '-':
-            result = num1 - num2;
-            break;
+            return parseFloat((n1 - n2).toFixed(2));
         case 'x':
-            result = (num1 * num2).toFixed(2);
-            break;
+            return parseFloat((n1 * n2).toFixed(2));
         case '÷':
-            result = (num1 / num2).toFixed(2);
-            break;
+            if (n2 == 0) {
+                liveDisplay.textContent = "CAN'T DIVIDE BY ZERO";
+                break
+            } else {
+                return parseFloat((n1 / n2).toFixed(2));
+            }
         case 'bⁿ':
-            result = num1 ** num2;
-            break;
+            return parseFloat((n1 ** n2).toFixed(2));
     }
-    registeredDisplay.textContent = num1 + ' ' + operator.replace('bⁿ', '^') + ' ' + num2 + ' =';
-    liveDisplay.textContent = result;
-    resultFlag = true;
 }
 
 function clearAllFct() {
     num1 = 0;
     num2 = 0;
     operator = '';
+    lastClick = '';
+    numRes = 0;
+    numBuffer = '';
     resultFlag = false;
     registeredDisplay.textContent = '';
-    liveDisplay.textContent = '';
+    liveDisplay.textContent = '0';
 }
 
-squareRoot.addEventListener('click', () => {
-    num1 = parseFloat(liveDisplay.textContent);
-    registeredDisplay.textContent = '√ ' + liveDisplay.textContent;
-    liveDisplay.textContent = num1 ** (1/2);
-    resultFlag = true;
-})
-
-numbers.forEach((number) => {
-    number.addEventListener('click', ()=> {   //forbid double dots
-        if (resultFlag == true) {
-            clearAllFct();
-        }
-        if (number.textContent == '.' && liveDisplay.textContent.indexOf('.') == -1) {
-            liveDisplay.textContent += number.textContent;
-        } else if (number.textContent != '.') {
-            liveDisplay.textContent += number.textContent;
-        }
+buttons.forEach(button => {
+    button.addEventListener('click', () => {
+        (button.id == 'result' || button.classList.value == '') ? lastClick = button.id : lastClick = button.classList.value;
+        displayMng(button);
     })
-})
-
-operators.forEach((operator) => {
-    operator.addEventListener('click', () => {
-        displayMng(operator.textContent);
-    })
-})
-
-resultBtn.addEventListener('click', () => {
-    if (!num2) num2 = liveDisplay.textContent;
-    operate(operator,num1,num2);
 })
 
 clearAll.addEventListener('click', () => {
@@ -93,13 +120,12 @@ clearAll.addEventListener('click', () => {
 })
 
 clearEntry.addEventListener('click', () => {
-    liveDisplay.textContent = '';
+    lastClick = clearEntry.textContent;
+    liveDisplay.textContent = '0';
+    numBuffer = '';
+    (operator) ? num2 = 0 : num1 = 0;
     if (resultFlag) {
         clearAllFct();
-    } else {
-        (operator) ? num2 = 0 : num1 = 0;
+        resultFlag = false;
     }
-    //if (!resultFlag) { (operator) ? num2 = 0 : num1 = 0;}
-    //(operator) ? num2 = 0 : num1 = 0;
-    resultFlag = false;
 })
